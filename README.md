@@ -66,7 +66,7 @@ public:
 ```
 We defined three type with the interaction from A to B, C; from B to A and from C to A, B.
 ```C++
-        InteractionBase* a = new A(), *b = new B(), *c = new C();
+    InteractionBase* a = new A(), *b = new B(), *c = new C();
     a->onAction(a);
     b->onAction(a);
     c->onAction(a);
