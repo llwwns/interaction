@@ -23,6 +23,9 @@ public:
     using InteractionBase::action;
     A() : InteractionBase(this) {
     }
+    template <class T>
+    A(T* t) : Interaction(t) {
+    }
     
     void action(B* b)
     {
@@ -44,11 +47,11 @@ public:
         cout << "call B for A" << endl;
     }
 };
-class C : public InteractionBase
+class C : public A
 {
 public:
-    using InteractionBase::action;
-    C() : InteractionBase(this) {
+    using A::action;
+    C() : A(this) {
     }
     void action(A* a)
     {
@@ -59,6 +62,7 @@ public:
         cout << "call C for B" << endl;
     }
 };
+
 ```
 We defined three type with the interaction from A to B, C; from B to A and from C to A, B.
 ```C++
@@ -75,16 +79,17 @@ We defined three type with the interaction from A to B, C; from B to A and from 
 ```
 Run these code will get output like this even we don't know the type of all the objects:
 ```
-call base for 1A
+call default function
 call A for B
 call A for C
 call B for A
-call base for 1B
-call base for 1C
+call default function
+call B for A
 call C for A
 call C for B
-call base for 1C
+call A for C
 ```
+C will be treated as A if there is no function deal with C but a function deal with A is exist.
 #Compile
 ```
 g++ interaction.cpp --std=c++11
