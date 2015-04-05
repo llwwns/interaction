@@ -5,24 +5,29 @@
 #include "tuple_type.h"
 
 template <class T, class U>
-void call_action(void* this_, const U& u)
+void call_action(void* this_, U* u)
 {
-    T& t = *static_cast<T*>(this_);
-    t.action(u);
+    static_cast<T*>(this_)->action(u);
+}
+
+template<class T, class U>
+void call_action_base(void* this_, U* t)
+{
+    static_cast<U*>(this_)->callAction(static_cast<T*>(t));
 }
 
 template <class T>
-using act_ptr = void (*)(void*, const T&);
+using act_ptr = void (*)(void*, T*);
 
 template <class ...Args>
 class Interaction
 {
 protected:
-    const std::tuple<act_ptr<Args>...>* vtable;
+    const std::tuple<act_ptr<Interaction<Args...>>, act_ptr<Args>...>* vtable;
 public:
     template <class T>
     struct vtable_init {
-        const static std::tuple<act_ptr<Args>...> vtable;
+        const static std::tuple<act_ptr<Interaction<Args...>>, act_ptr<Args>...> vtable;
     };
     template <class T>
     Interaction(T*)
@@ -30,19 +35,27 @@ public:
         vtable = &vtable_init<T>::vtable;
     }
     template <class T>
-    void callAction(const T& t)
+    void callAction(T* t)
     {
        get_by_type<act_ptr<T>>(*vtable)(this, t);
     }
     template <class T>
-    void action(const T&)
+    void action(T*)
     {
         std::cout << "call base for " << typeid(T).name() << std::endl;
     }
 
-    virtual void onAction(Interaction<Args...>& b) = 0;
+    void onAction(Interaction<Args...>* b) {
+       get_by_type<act_ptr<Interaction<Args...>>>(*vtable)(b, this);
+    }
 };
 template <class ...Args>
 template <class T>
-const std::tuple<act_ptr<Args>...> Interaction<Args...>::vtable_init<T>::vtable = std::tuple<act_ptr<Args>...>{(&call_action<T, Args>)...};
+const std::tuple<act_ptr<Interaction<Args...>>, act_ptr<Args>...>
+    Interaction<Args...>::vtable_init<T>::vtable = 
+    std::tuple<act_ptr<Interaction<Args...>>, act_ptr<Args>...>
+    {
+        &call_action_base<T, Interaction<Args...>>,
+        (&call_action<T, Args>)...
+    };
 #endif
