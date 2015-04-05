@@ -12,6 +12,9 @@ public:
     using InteractionBase::action;
     A() : InteractionBase(this) {
     }
+    template <class T>
+    A(T* t) : Interaction(t) {
+    }
     
     void action(B* b)
     {
@@ -33,11 +36,11 @@ public:
         cout << "call B for A" << endl;
     }
 };
-class C : public InteractionBase
+class C : public A
 {
 public:
-    using InteractionBase::action;
-    C() : InteractionBase(this) {
+    using A::action;
+    C() : A(this) {
     }
     void action(A* a)
     {

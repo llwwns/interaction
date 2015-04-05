@@ -1,7 +1,5 @@
 #ifndef __INTERACTION_H__
 #define __INTERACTION_H__
-#include <typeinfo>
-#include <string>
 #include "tuple_type.h"
 
 template <class T, class U>
@@ -39,10 +37,9 @@ public:
     {
        get_by_type<act_ptr<T>>(*vtable)(this, t);
     }
-    template <class T>
-    void action(T*)
+    void action(Interaction<Args...>)
     {
-        std::cout << "call base for " << typeid(T).name() << std::endl;
+        std::cout << "call default function" << std::endl;
     }
 
     void onAction(Interaction<Args...>* b) {
