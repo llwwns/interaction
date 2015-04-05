@@ -52,10 +52,9 @@ public:
 template <class ...Args>
 template <class T>
 const std::tuple<act_ptr<Interaction<Args...>>, act_ptr<Args>...>
-    Interaction<Args...>::vtable_init<T>::vtable = 
-    std::tuple<act_ptr<Interaction<Args...>>, act_ptr<Args>...>
-    {
-        &call_action_base<T, Interaction<Args...>>,
-        (&call_action<T, Args>)...
-    };
+    Interaction<Args...>::vtable_init<T>::vtable = std::tuple_cat
+    (
+        std::make_tuple(&call_action_base<T, Interaction<Args...>>),
+        std::make_tuple((&call_action<T, Args>)...)
+    );
 #endif
