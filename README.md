@@ -90,6 +90,6 @@ call C for B
 call A for C
 ```
 C will be treated as A if there is no function deal with C but a function deal with A is exist.
-#Compile
+#Compile this example
 ```
-g++ interaction.cpp --std=c++11
+g++ example.cpp --std=c++11
