@@ -19,12 +19,14 @@ using InteractionBase = Interaction<A, B, C>;
 
 class A : public InteractionBase
 {
-public:
-    using InteractionBase::action;
-    A() : InteractionBase(this) {
-    }
+protected:
     template <class T>
     A(T* t) : Interaction(t) {
+    }
+public:
+    using InteractionBase::action;
+    A() {
+        setVtable<A>();
     }
     
     void action(B* b)
@@ -40,7 +42,9 @@ class B : public InteractionBase
 {
 public:
     using InteractionBase::action;
-    B() : InteractionBase(this) {
+    B()
+    {
+        setVtable<B>();
     }
     void action(A* a)
     {
@@ -51,7 +55,9 @@ class C : public A
 {
 public:
     using A::action;
-    C() : A(this) {
+    C()
+    {
+        setVtable<C>();
     }
     void action(A* a)
     {
@@ -62,7 +68,6 @@ public:
         cout << "call C for B" << endl;
     }
 };
-
 ```
 We defined three type with the interaction from A to B, C; from B to A and from C to A, B.
 ```C++
