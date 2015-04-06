@@ -20,24 +20,29 @@ using act_ptr = void (*)(void*, T*);
 template <class ...Args>
 class Interaction
 {
-protected:
-    const std::tuple<act_ptr<Interaction<Args...>>, act_ptr<Args>...>* vtable;
-public:
+private:
     template <class T>
     struct vtable_init {
         const static std::tuple<act_ptr<Interaction<Args...>>, act_ptr<Args>...> vtable;
     };
+    const std::tuple<act_ptr<Interaction<Args...>>, act_ptr<Args>...>* vtable;
+protected:
+    Interaction()
+    {
+        setVtable<Interaction<Args...>>();
+    }
     template <class T>
-    Interaction(T*)
+    setVtable()
     {
         vtable = &vtable_init<T>::vtable;
     }
+public:
     template <class T>
     void callAction(T* t)
     {
        get_by_type<act_ptr<T>>(*vtable)(this, t);
     }
-    void action(Interaction<Args...>)
+    void action(Interaction<Args...>*)
     {
         std::cout << "call default function" << std::endl;
     }
